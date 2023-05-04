@@ -19,9 +19,19 @@ where
 
     let (rpc_url, archival_rpc_url) = (NEAR_TESTNET_RPC_URL, NEAR_TESTNET_ARCHIVAL_RPC_URL);
 
-    match timeout(
+    let result = timeout(
         Duration::from_secs(secs),
         JsonRpcClient::connect(rpc_url).call(method),
+    )
+    .await;
+
+    if let Ok(resp) = result {
+        return resp;
+    }
+
+    match timeout(
+        Duration::from_secs(secs),
+        JsonRpcClient::connect(archival_rpc_url).call(method),
     )
     .await
     {
@@ -29,28 +39,12 @@ where
             return resp;
         }
         Err(err) => {
-            println!(
-                "json_rpc_call timeout for {} secs, err: {}, fallback to {}",
-                secs, err, archival_rpc_url
-            );
-            match timeout(
-                Duration::from_secs(secs),
-                JsonRpcClient::connect(archival_rpc_url).call(method),
+            return Err(RpcError::new(
+                0,
+                format!("json_rpc_call timeout for {} secs, err: {}", secs, err),
+                None,
             )
-            .await
-            {
-                Ok(resp) => {
-                    return resp;
-                }
-                Err(err) => {
-                    return Err(RpcError::new(
-                        0,
-                        format!("json_rpc_call timeout for {} secs, err: {}", secs, err),
-                        None,
-                    )
-                    .into());
-                }
-            }
+            .into());
         }
     }
 }
