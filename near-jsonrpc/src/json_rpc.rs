@@ -7,7 +7,7 @@ const DEFAULT_JSON_RPC_CALL_TIMEOUT: u64 = 8;
 pub const NEAR_TESTNET_RPC_URL: &str = "https://rpc.testnet.near.org";
 pub const NEAR_TESTNET_ARCHIVAL_RPC_URL: &str = "https://archival-rpc.testnet.near.org";
 
-pub async fn json_rpc_query_withtimeout<M>(
+pub async fn json_rpc_call_withtimeout<M>(
     method: &M,
     timeout_sec: Option<u64>,
 ) -> MethodCallResult<M::Response, M::Error>

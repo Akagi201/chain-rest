@@ -8,7 +8,7 @@ use serde_json::{from_slice, json};
 use std::collections::HashMap;
 
 mod json_rpc;
-use json_rpc::json_rpc_query_withtimeout;
+use json_rpc::json_rpc_call_withtimeout;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct GetUsersInfoParams {
@@ -63,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             },
         };
 
-        match json_rpc_query_withtimeout(&request, Some(10u64)).await {
+        match json_rpc_call_withtimeout(&request, Some(10u64)).await {
             Ok(resp) => {
                 println!("{:#?}", resp);
                 if let QueryResponseKind::CallResult(result) = resp.kind {
@@ -91,7 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     };
 
-    match json_rpc_query_withtimeout(&request, Some(10u64)).await {
+    match json_rpc_call_withtimeout(&request, Some(10u64)).await {
         Ok(resp) => {
             // println!("{:#?}", resp);
             if let QueryResponseKind::CallResult(result) = resp.kind {
